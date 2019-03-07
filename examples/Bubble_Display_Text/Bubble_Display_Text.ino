@@ -38,7 +38,7 @@ void loop()
   ledDisplay.print("There ");
   delay(1000);
 
-  scroll("      Arduino 7 SEg LED DisplaY      ");
+  scroll("      Arduino      ");
 
 
 }

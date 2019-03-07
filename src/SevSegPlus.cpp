@@ -19,11 +19,12 @@ Original Library by Dean Reading (deanreading@hotmail.com: http://arduino.cc/pla
 
 #include "SevSegPlus.h"
 
-
 SevenSegmentLedDisplayInterface::SevenSegmentLedDisplayInterface()
 {
   //Initial values
   digit = 1;
+  strncpy(display_string, "      ",6);
+
 }
 void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   byte dig1, byte dig2, byte dig3, byte dig4, byte dig5, byte dig6,
@@ -32,21 +33,20 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   {
     //Bring all the variables in from the caller
     numberOfDigits = numOfDigits;
-    digit1 = dig1;
-    digit2 = dig2;
-    digit3 = dig3;
-    digit4 = dig4;
-    digit5 = dig5;
-    digit6 = dig6;
-
-    segmentA = segA;
-    segmentB = segB;
-    segmentC = segC;
-    segmentD = segD;
-    segmentE = segE;
-    segmentF = segF;
-    segmentG = segG;
-    segmentDP = segDP;
+    DigitPins[0] = dig1;
+    DigitPins[1] = dig2;
+    DigitPins[2] = dig3;
+    DigitPins[3] = dig4;
+    DigitPins[4] = dig5;
+    DigitPins[5] = dig6;
+    SegmentPins[0] = segA;
+    SegmentPins[1] = segB;
+    SegmentPins[2] = segC;
+    SegmentPins[3] = segD;
+    SegmentPins[4] = segE;
+    SegmentPins[5] = segF;
+    SegmentPins[6] = segG;
+    SegmentPins[7] = segDP;
 
     //Assign input values to variables
     //mode is what the digit pins must be set at for it to be turned on. 0 for common cathode, 1 for common anode
@@ -65,21 +65,6 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
       SegOn = HIGH;
       SegOff = LOW;
     }
-
-    DigitPins[0] = digit1;
-    DigitPins[1] = digit2;
-    DigitPins[2] = digit3;
-    DigitPins[3] = digit4;
-    DigitPins[4] = digit5;
-    DigitPins[5] = digit6;
-    SegmentPins[0] = segmentA;
-    SegmentPins[1] = segmentB;
-    SegmentPins[2] = segmentC;
-    SegmentPins[3] = segmentD;
-    SegmentPins[4] = segmentE;
-    SegmentPins[5] = segmentF;
-    SegmentPins[6] = segmentG;
-    SegmentPins[7] = segmentDP;
 
     //Turn everything Off before setting pin as output
     //Set all digit pins off. Low for common anode, high for common cathode
@@ -124,43 +109,19 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
   void SevenSegmentLedDisplayInterface::refresh()
   {
-
     unsigned char characterToDisplay = display_string[digit-1];
     uint8_t chr = pgm_read_byte(&characterArray[characterToDisplay]);
 
-    //Turn off previous digit
-    if (chr & (1<<6)) digitalWrite_fast(segmentA, SegOff);
-    if (chr & (1<<5)) digitalWrite_fast(segmentB, SegOff);
-    if (chr & (1<<4)) digitalWrite_fast(segmentC, SegOff);
-    if (chr & (1<<3)) digitalWrite_fast(segmentD, SegOff);
-    if (chr & (1<<2)) digitalWrite_fast(segmentE, SegOff);
-    if (chr & (1<<1)) digitalWrite_fast(segmentF, SegOff);
-    if (chr & (1<<0)) digitalWrite_fast(segmentG, SegOff);
-
-    //Turn off this digit
-    switch(digit)
+    // Turn off segments
+    for (byte seg = 0 ; seg < 8 ; seg++)
     {
-      case 1:
-      digitalWrite_fast(digit1, DigitOff);
-      break;
-      case 2:
-      digitalWrite_fast(digit2, DigitOff);
-      break;
-      case 3:
-      digitalWrite_fast(digit3, DigitOff);
-      break;
-      case 4:
-      digitalWrite_fast(digit4, DigitOff);
-      break;
-      case 5:
-      digitalWrite_fast(digit5, DigitOff);
-      break;
-      case 6:
-      digitalWrite_fast(digit6, DigitOff);
-      break;
+      digitalWrite(SegmentPins[seg], SegOff);
     }
 
-    // Turn on next digit
+    // Deselect this digit
+    digitalWrite_fast(DigitPins[digit], DigitOff);
+
+    // Select next digit
     if (digit < (numberOfDigits+1)) {digit++;} else {digit=1;};
 
     characterToDisplay = display_string[digit-1];
@@ -168,36 +129,13 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
     if (chr==0){return;}
 
-    switch(digit)
+    digitalWrite_fast(DigitPins[digit], DigitOn);
+
+    // Turn on segments
+    for (byte seg = 0 ; seg < 7 ; seg++)
     {
-      case 1:
-      digitalWrite_fast(digit1, DigitOn);
-      break;
-      case 2:
-      digitalWrite_fast(digit2, DigitOn);
-      break;
-      case 3:
-      digitalWrite_fast(digit3, DigitOn);
-      break;
-      case 4:
-      digitalWrite_fast(digit4, DigitOn);
-      break;
-      case 5:
-      digitalWrite_fast(digit5, DigitOn);
-      break;
-      case 6:
-      digitalWrite_fast(digit6, DigitOn);
-      break;
+      if (chr & (1<<seg)) digitalWrite_fast(SegmentPins[6-seg], SegOn);
     }
-
-    if (chr & (1<<6)) digitalWrite_fast(segmentA, SegOn);
-    if (chr & (1<<5)) digitalWrite_fast(segmentB, SegOn);
-    if (chr & (1<<4)) digitalWrite_fast(segmentC, SegOn);
-    if (chr & (1<<3)) digitalWrite_fast(segmentD, SegOn);
-    if (chr & (1<<2)) digitalWrite_fast(segmentE, SegOn);
-    if (chr & (1<<1)) digitalWrite_fast(segmentF, SegOn);
-    if (chr & (1<<0)) digitalWrite_fast(segmentG, SegOn);
-
   }
 
   // Fast digital write as we are in an interrupt handler
@@ -273,14 +211,11 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     while (TC4->COUNT8.STATUS.bit.SYNCBUSY);        // Wait for synchronization
   }
 
-
   SevenSegmentLedDisplayInterface myLedDisplayInterface;
   void TC4_Handler() { myLedDisplayInterface.Handler(); };
 
+  SevSegPlus::SevSegPlus(){}
 
-  SevSegPlus::SevSegPlus(){
-
-  }
   void SevSegPlus::begin(){
     myLedDisplayInterface.begin();
   }

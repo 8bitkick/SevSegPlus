@@ -177,7 +177,7 @@ private:
   byte numberOfDigits;
   byte digit;
 
-  char display_string[7];
+  char display_buffer[6];
 
   unsigned int brightnessDelay;
 

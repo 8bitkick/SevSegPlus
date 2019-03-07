@@ -108,7 +108,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   {
     int len = strlen(myString);
     if (len>6) {len=6;};
-    strncpy(display_string, myString,6);
+    strncpy(display_string, myString,len);
   }
 
   void SevenSegmentLedDisplayInterface::print(int myInt)

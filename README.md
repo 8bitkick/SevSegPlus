@@ -2,6 +2,9 @@
 
 Display numbers and characters on a 6 digit 7-segment display without additional controller. Tested with NSA1166 bubble LED display
 
+
+![Alt Text](https://github.com/8bitkick/SevSegPlus/blob/master/examples/example.png?raw=true)
+
 ## Improvements
 
 - Display now refreshed in the background using timer based interrupts (no need to call in loop)
@@ -77,6 +80,5 @@ Based on: https://github.com/sparkfun/SevSeg
 
 Original Library: http://arduino.cc/playground/Main/SevenSegmentLibrary
 
-![Alt Text](https://github.com/8bitkick/SevSegPlus/blob/master/examples/example.png?raw=true)
 
 

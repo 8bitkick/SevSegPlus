@@ -22,7 +22,7 @@ Original Library by Dean Reading (deanreading@hotmail.com: http://arduino.cc/pla
 SevenSegmentLedDisplayInterface::SevenSegmentLedDisplayInterface()
 {
   //Initial values
-  digit = 1;
+  digit = 0;
   strncpy(display_string, "      ",6);
 
 }
@@ -109,11 +109,11 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
   void SevenSegmentLedDisplayInterface::refresh()
   {
-    unsigned char characterToDisplay = display_string[digit-1];
+    unsigned char characterToDisplay = display_string[digit];
     uint8_t chr = pgm_read_byte(&characterArray[characterToDisplay]);
 
     // Turn off segments
-    for (byte seg = 0 ; seg < 8 ; seg++)
+    for (byte seg = 0 ; seg < 7 ; seg++)
     {
       digitalWrite(SegmentPins[seg], SegOff);
     }
@@ -122,9 +122,9 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     digitalWrite_fast(DigitPins[digit], DigitOff);
 
     // Select next digit
-    if (digit < (numberOfDigits+1)) {digit++;} else {digit=1;};
+    if (digit < numberOfDigits-1) {digit++;} else {digit=0;};
 
-    characterToDisplay = display_string[digit-1];
+    characterToDisplay = display_string[digit];
     chr = pgm_read_byte(&characterArray[characterToDisplay]);
 
     if (chr==0){return;}
@@ -134,8 +134,9 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     // Turn on segments
     for (byte seg = 0 ; seg < 7 ; seg++)
     {
-      if (chr & (1<<seg)) digitalWrite_fast(SegmentPins[6-seg], SegOn);
+      if (chr & (64>>seg)) digitalWrite_fast(SegmentPins[seg], SegOn);  // 64 = bit 7 = Segment A
     }
+
   }
 
   // Fast digital write as we are in an interrupt handler
@@ -172,7 +173,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   // (48MHz/10= 4.8MHz, 4.8MHz/64=75kHz, 256kHz/(255 + 1) ~ 300 Hz ~ 50Hz refresh per digit).
   void SevenSegmentLedDisplayInterface::Timer()
   {
-    REG_GCLK_GENDIV = GCLK_GENDIV_DIV(10) |          // Divide the 48MHz clock source by divisor 10: 48MHz/10= 4.8 MHz
+    REG_GCLK_GENDIV = GCLK_GENDIV_DIV(12) |          // Divide the 48MHz clock source by divisor 10: 48MHz/10= 4.8 MHz
 
 
     GCLK_GENDIV_ID(4);            // Select Generic Clock (GCLK) 4

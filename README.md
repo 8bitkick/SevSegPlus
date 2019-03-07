@@ -15,7 +15,7 @@ Display numbers and characters on a 6 digit 7-segment display without additional
 - Use of TC4_Handler may clash with other libraries (e.g. LCD matrix drivers)
 
 ---
-Based on: https://github.com/sparkfun/SevSegPlus
+Based on: https://github.com/sparkfun/SevSeg
 
 Original Library: http://arduino.cc/playground/Main/SevenSegmentLibrary
 

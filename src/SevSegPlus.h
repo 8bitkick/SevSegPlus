@@ -145,15 +145,18 @@ const uint8_t characterArray[] PROGMEM = {
 };
 
 
-class SevSegPlus {
+
+
+class SevenSegmentLedDisplayInterface {
 
 public:
-  SevSegPlus();
+  SevenSegmentLedDisplayInterface();
 
   //Public Functions
   void begin(boolean mode_in, byte numOfDigits, byte digit1, byte digit2, byte digit3, byte digit4, byte digit5, byte digit6,byte segment1, byte segment2, byte segment3, byte segment4, byte segment5, byte segment6, byte segment7, byte segmentDP);
   void begin();
   void print(char * myString);
+  void print(int myInt);
   void refresh();
   void Handler();
   //Public Variables
@@ -184,4 +187,11 @@ private:
   byte nums[6];
 };
 
+class SevSegPlus {
+public:
+  SevSegPlus();
+  void begin();
+  void print(char * myString);
+  void print(int myInt);
+};
 #endif

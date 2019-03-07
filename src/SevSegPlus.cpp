@@ -19,14 +19,13 @@ Original Library by Dean Reading (deanreading@hotmail.com: http://arduino.cc/pla
 
 #include "SevSegPlus.h"
 
-SevSegPlus::SevSegPlus()
+
+SevenSegmentLedDisplayInterface::SevenSegmentLedDisplayInterface()
 {
   //Initial values
   digit = 1;
-  strcpy(display_string, "Hello ");
-
 }
-void SevSegPlus::begin(boolean mode_in, byte numOfDigits,
+void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   byte dig1, byte dig2, byte dig3, byte dig4, byte dig5, byte dig6,
   byte segA, byte segB, byte segC, byte segD, byte segE, byte segF, byte segG,
   byte segDP)
@@ -100,23 +99,30 @@ void SevSegPlus::begin(boolean mode_in, byte numOfDigits,
   }
 
   // Let's set up some default to reduce lines in the sketch.
-  void SevSegPlus::begin()
+  void SevenSegmentLedDisplayInterface::begin()
   {
     begin(COMMON_CATHODE,6,0,1,2,3,4,5,6,7,8,9,10,11,12,13);
   }
 
-  void SevSegPlus::print(char * myString)
+  void SevenSegmentLedDisplayInterface::print(char * myString)
   {
     int len = strlen(myString);
     if (len>6) {len=6;};
     strncpy(display_string, myString,6);
   }
 
+  void SevenSegmentLedDisplayInterface::print(int myInt)
+  {
+    char tempString[12]; //Used for sprintf
+    sprintf(tempString, "%6d", myInt);
+    strncpy(display_string, tempString,6);
+  }
+
   // Refresh Display - turn the previous digit off, and the next digit on
   // To be called by timer every 3ms
   /*******************************************************************************************/
 
-  void SevSegPlus::refresh()
+  void SevenSegmentLedDisplayInterface::refresh()
   {
 
     unsigned char characterToDisplay = display_string[digit-1];
@@ -194,16 +200,15 @@ void SevSegPlus::begin(boolean mode_in, byte numOfDigits,
 
   }
 
-
   // Fast digital write as we are in an interrupt handler
-  void SevSegPlus::digitalWrite_fast(int pin, bool val) { if (val)
+  void SevenSegmentLedDisplayInterface::digitalWrite_fast(int pin, bool val) { if (val)
     PORT->Group[g_APinDescription[pin].ulPort].OUTSET.reg = (1ul << g_APinDescription[pin].ulPin);
     else
     PORT->Group[g_APinDescription[pin].ulPort].OUTCLR.reg = (1ul << g_APinDescription[pin].ulPin);
   }
 
   // Interrupt Service Routine (ISR) for timer TC4
-  void SevSegPlus::Handler()
+  void SevenSegmentLedDisplayInterface::Handler()
   {
     // Check for overflow (OVF) interrupt
     if (TC4->COUNT8.INTFLAG.bit.OVF && TC4->COUNT8.INTENSET.bit.OVF)
@@ -227,7 +232,7 @@ void SevSegPlus::begin(boolean mode_in, byte numOfDigits,
   // Set up timer to call handler every 3ms
   // http://forum.arduino.cc/index.php?topic=396201.msg2727162#msg2727162
   // (48MHz/10= 4.8MHz, 4.8MHz/64=75kHz, 256kHz/(255 + 1) ~ 300 Hz ~ 50Hz refresh per digit).
-  void SevSegPlus::Timer()
+  void SevenSegmentLedDisplayInterface::Timer()
   {
     REG_GCLK_GENDIV = GCLK_GENDIV_DIV(10) |          // Divide the 48MHz clock source by divisor 10: 48MHz/10= 4.8 MHz
 
@@ -257,16 +262,31 @@ void SevSegPlus::begin(boolean mode_in, byte numOfDigits,
     REG_TC4_COUNT8_PER = 0xFF;                      // Set the PER (period) register to its maximum value
     while (TC4->COUNT8.STATUS.bit.SYNCBUSY);        // Wait for synchronization
 
-    //NVIC_DisableIRQ(TC4_IRQn);
-    //NVIC_ClearPendingIRQ(TC4_IRQn);
     NVIC_SetPriority(TC4_IRQn, 192);    // Set the Nested Vector Interrupt Controller (NVIC) priority for TC4 to 192 (lowest)
     NVIC_EnableIRQ(TC4_IRQn);         // Connect TC4 to Nested Vector Interrupt Controller (NVIC)
 
     REG_TC4_INTFLAG |= TC_INTFLAG_MC1 | TC_INTFLAG_MC0 | TC_INTFLAG_OVF;        // Clear the interrupt flags
     REG_TC4_INTENSET = TC_INTENSET_MC1 | TC_INTENSET_MC0 | TC_INTENSET_OVF;     // Enable TC4 interrupts
-    // REG_TC4_INTENCLR = TC_INTENCLR_MC1 | TC_INTENCLR_MC0 | TC_INTENCLR_OVF;     // Disable TC4 interrupts
 
     REG_TC4_CTRLA |= TC_CTRLA_PRESCALER_DIV64 |     // Set prescaler to 64
     TC_CTRLA_ENABLE;               // Enable TC4
     while (TC4->COUNT8.STATUS.bit.SYNCBUSY);        // Wait for synchronization
+  }
+
+
+  SevenSegmentLedDisplayInterface myLedDisplayInterface;
+  void TC4_Handler() { myLedDisplayInterface.Handler(); };
+
+
+  SevSegPlus::SevSegPlus(){
+
+  }
+  void SevSegPlus::begin(){
+    myLedDisplayInterface.begin();
+  }
+  void SevSegPlus::print(char * myString){
+    myLedDisplayInterface.print(myString);
+  }
+  void SevSegPlus::print(int myInt){
+    myLedDisplayInterface.print(myInt);
   }

@@ -12,11 +12,21 @@
 
 
 SevSegPlus ledDisplay; //Create an instance of the object.
-void TC4_Handler() { ledDisplay.Handler(); }; // Set up the display handler
 
 void setup()
 {
   ledDisplay.begin(); // Start the display refresh in background using timer
+}
+
+void scroll(char * text)
+{
+  char temp[6];
+  int  len = strlen(text);
+  for(int i = 0; i < (len-6); i++) {
+    strncpy(temp, text+i, 6);
+    ledDisplay.print(temp);
+    delay(200);
+  }
 }
 
 void loop()
@@ -28,13 +38,7 @@ void loop()
   ledDisplay.print("There ");
   delay(1000);
 
-  char scroll[] = "      Arduino       ";
-  char temp[6];
+  scroll("      Arduino 7 SEg LED DisplaY      ");
 
-  for(int i = 0; i < 13; i++) {
-    strncpy(temp, scroll+i, 6);
-    ledDisplay.print(temp);
-    delay(200);
-  }
 
 }

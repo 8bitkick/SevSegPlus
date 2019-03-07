@@ -1,6 +1,6 @@
 # SevSegPlus
 
-Display numbers and characters on a 6 digit 7-segment display without additional controller. Tested with NSA1166 bubble LED display
+Display numbers and characters on a 6 digit 7-segment display without additional controller. Tested with 1970s NSA1166 bubble LED display
 
 
 ![Alt Text](https://github.com/8bitkick/SevSegPlus/blob/master/examples/example.png?raw=true)

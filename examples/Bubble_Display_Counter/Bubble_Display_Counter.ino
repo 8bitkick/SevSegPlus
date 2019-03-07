@@ -26,7 +26,7 @@ void setup()
 void loop()
 {
 
-  // Every 10ms we update the display
+  // Every 10ms we increase the number
   if (millis() - timer >= 100)
   {
     timer = millis();

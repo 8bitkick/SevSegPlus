@@ -23,7 +23,7 @@ SevenSegmentLedDisplayInterface::SevenSegmentLedDisplayInterface()
 {
   //Initial values
   digit = 0;
-  strncpy(display_string, "      ",6);
+  strncpy(display_buffer, "\0\0\0\0\0\0",6);
 
 }
 void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
@@ -93,14 +93,20 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   {
     int len = strlen(myString);
     if (len>6) {len=6;};
-    strncpy(display_string, myString,len);
+
+    // Do the conversion from ASCII character to segment pattern
+    for (int d = 0 ; d < len ; d++)
+    {
+      uint8_t chr = pgm_read_byte(&characterArray[myString[d]]);
+      display_buffer[d] = chr;
+    }
   }
 
   void SevenSegmentLedDisplayInterface::print(int myInt)
   {
-    char tempString[12]; //Used for sprintf
+    char tempString[7]; //Used for sprintf
     sprintf(tempString, "%6d", myInt);
-    strncpy(display_string, tempString,6);
+    print(tempString);
   }
 
   // Refresh Display - turn the previous digit off, and the next digit on
@@ -109,13 +115,11 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
   void SevenSegmentLedDisplayInterface::refresh()
   {
-    unsigned char characterToDisplay = display_string[digit];
-    uint8_t chr = pgm_read_byte(&characterArray[characterToDisplay]);
 
     // Turn off segments
     for (byte seg = 0 ; seg < 7 ; seg++)
     {
-      digitalWrite(SegmentPins[seg], SegOff);
+      digitalWrite_fast(SegmentPins[seg], SegOff);
     }
 
     // Deselect this digit
@@ -124,8 +128,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     // Select next digit
     if (digit < numberOfDigits-1) {digit++;} else {digit=0;};
 
-    characterToDisplay = display_string[digit];
-    chr = pgm_read_byte(&characterArray[characterToDisplay]);
+    unsigned char chr = display_buffer[digit];
 
     if (chr==0){return;}
 

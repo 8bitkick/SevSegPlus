@@ -4,7 +4,7 @@ Display numbers and characters on a 6 digit 7-segment display without additional
 
 ## Improvements
 
-- Display now refreshed using timer based interrupts (no need to call in loop)
+- Display now refreshed in the background using timer based interrupts (no need to call in loop)
 - Added 6 segment display support tested on NSA1166 bubble LED display
 - Library calls made a little simpler
 - Some speed optimizations

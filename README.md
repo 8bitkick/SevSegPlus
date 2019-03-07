@@ -14,11 +14,19 @@ Display numbers and characters on a 6 digit 7-segment display without additional
 - For Arduino Due, Zero or MKR only
 - Use of TC4_Handler may clash with other libraries (e.g. LCD matrix drivers)
 
----
+## Usage
+
+Instancing with `ledDisplay.begin();` defaults to the NSA1166 setup with the following pin assignments:
+
+* Arduino pins 0-5 = LED digits 1-6 (NSA1166 c3 - c8)
+* Arduino pins 6-13 = LED segments A-G (NSA1166 Aa - Ga)
+
+## Credits
+
 Based on: https://github.com/sparkfun/SevSeg
 
 Original Library: http://arduino.cc/playground/Main/SevenSegmentLibrary
 
-
 ![Alt Text](https://github.com/8bitkick/SevSegPlus/blob/master/examples/example.png?raw=true)
+
 

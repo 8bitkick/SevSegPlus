@@ -23,6 +23,7 @@ SevenSegmentLedDisplayInterface::SevenSegmentLedDisplayInterface()
 {
   //Initial values
   digit = 0;
+  new_buffer = true;
   strncpy(display_buffer, "\0\0\0\0\0\0",6);
 
 }
@@ -48,6 +49,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     SegmentPins[6] = segG;
     SegmentPins[7] = segDP;
 
+
     //Assign input values to variables
     //mode is what the digit pins must be set at for it to be turned on. 0 for common cathode, 1 for common anode
     mode = mode_in;
@@ -66,6 +68,8 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
       SegOff = LOW;
     }
 
+    SegFlip[1] = SegOn;
+    SegFlip[0] = SegOff;
     //Turn everything Off before setting pin as output
     //Set all digit pins off. Low for common anode, high for common cathode
     for (byte digit = 0 ; digit < numberOfDigits ; digit++)
@@ -100,6 +104,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
       uint8_t chr = pgm_read_byte(&characterArray[myString[d]]);
       display_buffer[d] = chr;
     }
+    new_buffer = true;
   }
 
   void SevenSegmentLedDisplayInterface::print(int myInt)
@@ -115,29 +120,34 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
   void SevenSegmentLedDisplayInterface::refresh()
   {
+    byte mask;
+    int lastDigit = digit;
 
-    // Turn off segments
-    for (byte seg = 0 ; seg < 7 ; seg++)
+    // Turn off last digit
+    digitalWrite_fast(DigitPins[lastDigit], DigitOff);
+
+    // Light up next digit and fetch new segments
+    if (digit < numberOfDigits-1) {digit++;} else {digit=0;};
+    digitalWrite_fast(DigitPins[digit], DigitOn);
+    char chr = display_buffer[digit];
+
+    // Work out which segments need flipping
+    if (new_buffer)
     {
-      digitalWrite_fast(SegmentPins[seg], SegOff);
+      mask = 255; new_buffer = false;
+    }
+    else
+    {
+      mask = (display_buffer[lastDigit] ^ display_buffer[digit]);
     }
 
-    // Deselect this digit
-    digitalWrite_fast(DigitPins[digit], DigitOff);
-
-    // Select next digit
-    if (digit < numberOfDigits-1) {digit++;} else {digit=0;};
-
-    unsigned char chr = display_buffer[digit];
-
-    if (chr==0){return;}
-
-    digitalWrite_fast(DigitPins[digit], DigitOn);
-
-    // Turn on segments
+    // Toggle pins driving segments that changed
     for (byte seg = 0 ; seg < 7 ; seg++)
     {
-      if (chr & (64>>seg)) digitalWrite_fast(SegmentPins[seg], SegOn);  // 64 = bit 7 = Segment A
+      if (mask & 64>>seg)
+      {
+        digitalWrite_fast(SegmentPins[seg], SegFlip[(chr>>(6-seg))&1]);
+      }
     }
 
   }

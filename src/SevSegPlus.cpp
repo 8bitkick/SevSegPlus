@@ -12,7 +12,7 @@ Allows an Arduino to easily display numbers and characters on a 6 digit 7-segmen
 For Arduino Due, Zero or MKR only.
 
 ---
-Based on: https://github.com/sparkfun/SevSegPlus
+Based on: https://github.com/sparkfun/SevSeg
 Original Library by Dean Reading (deanreading@hotmail.com: http://arduino.cc/playground/Main/SevenSegmentLibrary), 2012
 
 */

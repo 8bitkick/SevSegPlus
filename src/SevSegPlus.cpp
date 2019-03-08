@@ -93,7 +93,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
     begin(COMMON_CATHODE,6,0,1,2,3,4,5,6,7,8,9,10,11,12,13);
   }
 
-  void SevenSegmentLedDisplayInterface::print(char * myString)
+  void SevenSegmentLedDisplayInterface::print(const char * myString)
   {
     int len = strlen(myString);
     if (len>6) {len=6;};
@@ -187,7 +187,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   // (48MHz/10= 4.8MHz, 4.8MHz/64=75kHz, 256kHz/(255 + 1) ~ 300 Hz ~ 50Hz refresh per digit).
   void SevenSegmentLedDisplayInterface::Timer()
   {
-    REG_GCLK_GENDIV = GCLK_GENDIV_DIV(12) |          // Divide the 48MHz clock source by divisor 10: 48MHz/10= 4.8 MHz
+    REG_GCLK_GENDIV = GCLK_GENDIV_DIV(10) |          // Divide the 48MHz clock source by divisor 10: 48MHz/10= 4.8 MHz
 
 
     GCLK_GENDIV_ID(4);            // Select Generic Clock (GCLK) 4
@@ -234,7 +234,7 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
   void SevSegPlus::begin(){
     myLedDisplayInterface.begin();
   }
-  void SevSegPlus::print(char * myString){
+  void SevSegPlus::print(const char * myString){
     myLedDisplayInterface.print(myString);
   }
   void SevSegPlus::print(int myInt){

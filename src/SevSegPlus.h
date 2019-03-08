@@ -184,6 +184,8 @@ private:
   byte DigitPins[6];
   byte SegmentPins[8];
   boolean lights[6][8];
+  boolean SegFlip[2];
+  boolean new_buffer;
   byte nums[6];
 };
 

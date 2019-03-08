@@ -3,7 +3,7 @@
 Display numbers and characters on a 6 digit 7-segment display without additional controller. Tested with 1970s NSA1166 bubble LED display
 
 
-![Alt Text](https://github.com/8bitkick/SevSegPlus/blob/master/examples/example.png?raw=true)
+![Alt Text](https://raw.githubusercontent.com/8bitkick/SevSegPlus/master/examples/led.gif)
 
 ## Improvements
 

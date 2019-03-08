@@ -18,7 +18,7 @@ void setup()
   ledDisplay.begin(); // Start the display refresh in background using timer
 }
 
-void scroll(char * text)
+void scroll(const char * text)
 {
   char temp[6];
   int  len = strlen(text);

@@ -120,18 +120,19 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
 
   void SevenSegmentLedDisplayInterface::refresh()
   {
-    byte mask;
     int lastDigit = digit;
+    byte mask;
+    byte digitSegments;
 
     // Turn off last digit
     digitalWrite_fast(DigitPins[lastDigit], DigitOff);
 
-    // Light up next digit and fetch new segments
+    // Light up next digit and fetch segments for that digit
     if (digit < numberOfDigits-1) {digit++;} else {digit=0;};
     digitalWrite_fast(DigitPins[digit], DigitOn);
-    char chr = display_buffer[digit];
+    digitSegments = display_buffer[digit];
 
-    // Work out which segments need flipping
+    // Work out which segments need flipping moving from previous digit
     if (new_buffer)
     {
       mask = 255; new_buffer = false;
@@ -141,12 +142,12 @@ void SevenSegmentLedDisplayInterface::begin(boolean mode_in, byte numOfDigits,
       mask = (display_buffer[lastDigit] ^ display_buffer[digit]);
     }
 
-    // Toggle pins driving segments that changed
+    // Toggle pins driving segments that change for the next digit
     for (byte seg = 0 ; seg < 7 ; seg++)
     {
       if (mask & 64>>seg)
       {
-        digitalWrite_fast(SegmentPins[seg], SegFlip[(chr>>(6-seg))&1]);
+        digitalWrite_fast(SegmentPins[seg], SegFlip[(digitSegments>>(6-seg))&1]);
       }
     }
 

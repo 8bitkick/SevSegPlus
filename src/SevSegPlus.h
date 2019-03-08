@@ -1,4 +1,4 @@
-//Written by Dean Reading, 2012.  deanreading@hotmail.com
+// Modified from original written by Dean Reading, 2012.  deanreading@hotmail.com
 //See .cpp file for info
 
 #ifndef SevSegPlus_h
@@ -155,7 +155,7 @@ public:
   //Public Functions
   void begin(boolean mode_in, byte numOfDigits, byte digit1, byte digit2, byte digit3, byte digit4, byte digit5, byte digit6,byte segment1, byte segment2, byte segment3, byte segment4, byte segment5, byte segment6, byte segment7, byte segmentDP);
   void begin();
-  void print(char * myString);
+  void print(const char* myString);
   void print(int myInt);
   void refresh();
   void Handler();
@@ -193,7 +193,7 @@ class SevSegPlus {
 public:
   SevSegPlus();
   void begin();
-  void print(char * myString);
+  void print(const char * myString);
   void print(int myInt);
 };
 #endif
